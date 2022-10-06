@@ -1,14 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import Signup from "./pages/Signup";
+import {
+  LOGIN,
+  DASHBOARD,
+  SIGN_UP,
+  PROFILE,
+  NOT_FOUND,
+} from "./constants/routes";
+
+const LogIn = lazy(() => import("./pages/Login"));
 
 function App() {
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold underline text-red-900">
-      Hello world!
-    </h1> 
-      
-    </div>
+    <BrowserRouter>
+      <Suspense fallback={<p>Loading....</p>} />
+      <Routes>
+        <Route path={LOGIN} element={<LogIn />} />
+        <Route path={SIGN_UP} element={<Signup />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
