@@ -45,6 +45,7 @@ function Signup() {
     console.log("user______", querySnapshot);
     if (querySnapshot.size > 0) {
       console.log("i found anything");
+      setError("user already exists");
     } else {
       try {
         console.log("i not found anything");
@@ -52,6 +53,7 @@ function Signup() {
           .then(async (userCredential) => {
             //Signed in
             const users = userCredential.user;
+
             const finalUser = {
               userId: "10",
               username: username,
@@ -62,20 +64,24 @@ function Signup() {
               dateCreated: Date.now(),
             };
             await addDoc(collection(db, "users"), finalUser);
-
-            // ...
           })
 
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            // ..
+            console.log(error, "error_____");
+            setError("email already in use");
           });
       } catch (error) {
         console.log("error_____");
       }
     }
   }
+
+  const handleChangeState = (eventValue, inputField) => {
+    inputField(eventValue);
+    setError("");
+  };
 
   return (
     <form onSubmit={handleSubmit} method="POST">
@@ -97,24 +103,25 @@ function Signup() {
             <input
               className=" appearance-none border border-gray-300  min-w-full m-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
               placeholder="username"
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => handleChangeState(e.target.value, setUsername)}
             />
             <input
               className=" appearance-none border border-gray-300  min-w-full m-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
               placeholder="full Name"
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => handleChangeState(e.target.value, setFullName)}
             />
             <input
               className=" appearance-none border border-gray-300  min-w-full m-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
               placeholder="email"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => handleChangeState(e.target.value, setEmail)}
             />
             <input
               className=" appearance-none border border-gray-300  min-w-full mx-4 my-2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
               placeholder="password"
               type="password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => handleChangeState(e.target.value, setPassword)}
             />
+            <p className="text-red-500 font-medium">{error}</p>
             <button
               className={`bg-blue-500 rounded font-bold my-4 py-2 text-blue-50 px-4 min-w-full ${
                 inActive && "bg-blue-300"

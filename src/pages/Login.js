@@ -8,6 +8,7 @@ import {
   PROFILE,
   NOT_FOUND,
 } from "../constants/routes";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -21,7 +22,34 @@ function Login() {
   const { app } = useContext(firebaseContext);
   //console.log("app____",app)
 
+  const auth = getAuth(app);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        // ...
+        if(user){
+          navigate('/')
+        }
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setError("username/password is not correct")
+
+      });
+  }
+
+  const handleChangeState = (eventValue, inputField) => {
+    inputField(eventValue);
+    setError("");
+  };
+
   return (
+    <form onSubmit={handleSubmit} method="POST">
     <div className="flex container mx-auto max-w-screen-md items-center h-screen">
       <div className="basis-1/2">
         <div>
@@ -39,14 +67,18 @@ function Login() {
           <input
             className=" appearance-none border border-gray-300  min-w-full m-4 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
             placeholder="email"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => handleChangeState(e.target.value, setEmail)}
+
+            
           />
           <input
             className=" appearance-none border border-gray-300  min-w-full mx-4 my-2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
             placeholder="password"
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
+            type="password"            
+            onChange={(e) => handleChangeState(e.target.value, setPassword)}
+
           />
+          <p className="text-red-500 font-medium">{error}</p>
           <button
             className={`bg-blue-500 rounded font-bold my-4 py-2 text-blue-50 px-4 min-w-full ${
               inActive && "bg-blue-300"
@@ -58,7 +90,7 @@ function Login() {
         <div className="border-2 my-4 p-4 border-gray-300 h-1/4 relative max-w-full items-center justify-center  ">
           <div className="flex items-center justify-center">
             Don't have an account?{" "}
-            <span className="text-blue-500" onClick={() => navigate(SIGN_UP)}>
+            <span className="text-blue-500 cursor-pointer" onClick={() => navigate(SIGN_UP)}>
               {" "}
               Sign Up
             </span>
@@ -77,6 +109,7 @@ function Login() {
         </div>
       </div>
     </div>
+    </form>
   );
 }
 
