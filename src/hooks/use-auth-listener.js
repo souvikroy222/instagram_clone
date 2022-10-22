@@ -1,31 +1,36 @@
 import { useState, useEffect, useContext } from "react";
 import { firebaseContext } from "../context/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app, auth } from "../lib/firebase";
 
 export default function useAuthListener() {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("userInfo"))
+  const [loginUser, setLoginUser] = useState(
+    localStorage.getItem("userInfo")
+      ? JSON.parse(localStorage.getItem("userInfo"))
+      : "souvik Roy"
   );
-
-  const { app } = useContext(firebaseContext);
-  const auth = getAuth(app);
 
   useEffect(() => {
     const changesListener = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const uid = user.uid;
-        const newUser = localStorage.setItem("userInfo", JSON.stringify(user));
-        setUser(newUser);
-        console.log("user changes triggered now", user);
+        try {
+          const uid = user.uid;
+          localStorage.setItem("userInfo", JSON.stringify(user));
+          setLoginUser(user);
+          console.log("user changes triggered now", user);
+        } catch (error) {
+          console.log("error occured");
+        }
       } else {
-        setUser(null);
+        setLoginUser(null);
         localStorage.removeItem("userInfo");
       }
     });
+
     return () => {
       changesListener();
     };
-  }, [app]);
+  }, [loginUser]);
 
-  return { user };
+  return { loginUser };
 }

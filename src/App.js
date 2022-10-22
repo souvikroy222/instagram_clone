@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useContext } from "react";
 import userContext from "./context/user";
 import {
   LOGIN,
@@ -17,18 +17,19 @@ const DashBoard = lazy(() => import("./pages/Dashboard"));
 const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
 function App() {
-  const { user } = useAuthListener();
+  const { loginUser } = useAuthListener();
 
   return (
-    <userContext.Provider value={{ user }}>
+    <userContext.Provider value={{ loginUser }}>
       <BrowserRouter>
-        <Suspense fallback={<p>Loading....</p>} />
+        <Suspense fallback={<p>Loading....</p>} >
         <Routes>
           <Route path={LOGIN} element={<LogIn />} />
           <Route path={SIGN_UP} element={<SignUp />} />
           <Route path={DASHBOARD} element={<DashBoard />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </userContext.Provider>
   );

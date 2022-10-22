@@ -1,7 +1,11 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { firebaseContext } from "../context/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { isUserExists } from "../services/utils";
 import {
   Firestore,
@@ -53,7 +57,6 @@ function Signup() {
           .then(async (userCredential) => {
             //Signed in
             const users = userCredential.user;
-
             const finalUser = {
               userId: "10",
               username: username,
@@ -64,6 +67,9 @@ function Signup() {
               dateCreated: Date.now(),
             };
             await addDoc(collection(db, "users"), finalUser);
+            await updateProfile(auth.currentUser, {
+              displayName: fullname,
+            });
           })
 
           .catch((error) => {
